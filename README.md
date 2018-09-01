@@ -1,5 +1,12 @@
 # Facebook Singapore Hackathon: Bad Memes
 
+# Development Plan
+Create a chrome extension that adds a label to the timestamp of every Facebook post. The site will be updated every second. Refer to ProjectFib for the possible implementation. A successful implementation means that the search can be done automatically, and the extension knows where to find the information for both the post and the image. Reference: https://github.com/tonghuikang/ProjectFib/blob/master/extension/myScript.js
+
+Create a javascript function that takes in text input and a public image URL and returns the relevant fact check URL. We will be using Google APIs. Reference: https://github.com/tonghuikang/fb-sg-hack/blob/master/chrome/background.js
+
+Put these two together and make them work. As the appending of HTML links are done automatically, it will be under `"content_scripts" : "js"` We will do this during the hackathon.
+
 ### User journey
 The user scrolls through his Facebook feed. The contents of each post is being analysed on the background by the extension. After a few seconds, a hyperlink of the ClaimReview and its ClaimRating is displayed beside the timestamp. The user may click on the timestamp to read the fact check article on the fact-checking site, then comment on the argue against the post if necessary.
 
