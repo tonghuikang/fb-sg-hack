@@ -100,6 +100,7 @@ function updateLabel() {
             xhr_keyword_n.open("POST", 'https://language.googleapis.com/v1/documents:analyzeEntitySentiment?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
             xhr_keyword_n.setRequestHeader('Content-Type', 'application/json');
             xhr_keyword_n.send(body_keyword_n);
+            console.log("Running Google Natural Language API on for entity sentiment: " + text_to_parse)
             xhr_keyword_n.onreadystatechange = function() {
                 if (xhr_keyword_n.readyState === 4) {
                     var serverResponse = xhr_keyword_n.responseText;
@@ -114,7 +115,6 @@ function updateLabel() {
                     }
                     var nouns_string = noun_list.join(' ');
                     console.log(nouns_string);
-                    // I don't know how to line break within paragraph cell :/
                     label.textContent = label.textContent + longDivider + " result_keyword_noun (not used for the next step yet, haven't make use of the verbs also): " + nouns_string;
 
                     ///////////////////////
@@ -134,6 +134,7 @@ function updateLabel() {
                     xhr_keyword_v.open("POST", 'https://language.googleapis.com/v1/documents:analyzeSyntax?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
                     xhr_keyword_v.setRequestHeader('Content-Type', 'application/json');
                     xhr_keyword_v.send(body_keyword_v);
+                    console.log("Running Google Natural Language API for syntax analysis: " + text_to_parse)
                     xhr_keyword_v.onreadystatechange = function() {
                         if (xhr_keyword_v.readyState === 4) {
                             var serverResponse = xhr_keyword_v.responseText;
@@ -153,14 +154,6 @@ function updateLabel() {
                                     root_verbs.push(word_in_context);
                                 }
                             }
-                            //   if (obj.hasOwnProperty(key)) {
-                            //     var val = obj[key];
-                            //     console.log(val);
-                            //   }
-                            // }
-                            // var result_keyword = jsonParsed.entities[0].name; // WILL ITERATE AND GET ALL THE NAMES
-                            // console.log(result_keyword);
-                            // I don't know how to line break within paragraph cell :/
                             var verbs_string = root_verbs.join(' ');
                             label.textContent = label.textContent + longDivider + " result_keyword_verb (not used for the next step yet, haven't make use of the verbs also): " + verbs_string;
 
@@ -175,6 +168,7 @@ function updateLabel() {
                             var xhr_search = new XMLHttpRequest();
                             xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E&cx=006556501642864997360:yq85mpbgvaq&q=' + text_to_search, true);
                             xhr_search.send(null);
+                            console.log("Running Google Custom Search API to search fact-check articles : " + text_to_search)
                             xhr_search.onreadystatechange = function() {
                                 if (xhr_search.readyState === 4) {
                                     var serverResponse = xhr_search.responseText;
@@ -183,10 +177,16 @@ function updateLabel() {
                                     // Now we need to extract the relevant search keywords, the next step is Google cloud language
                                     console.log("Google Custom Search results");
                                     console.log(jsonParsed);
-                                    var result_search = jsonParsed.items[0].formattedUrl;
-                                    console.log(result_search);
-                                    // I don't know how to line break within paragraph cell :/
-                                    label.textContent = label.textContent + longDivider + " result_search : " + result_search;
+                                    var fact_checks_list = [];
+                                    for (var index in jsonParsed.items){
+                                      var fact_check_title = jsonParsed.items[index].title;
+                                      var fact_check_link = jsonParsed.items[index].link;
+                                      console.log(fact_check_title);
+                                      console.log(fact_check_link);
+                                      fact_checks_list.push(fact_check_link + ':' + fact_check_title + ' --- ')
+                                    }
+                                    var fact_checks_string = fact_checks_list.join(' ')
+                                    label.textContent = label.textContent + longDivider + " result_search : " + fact_checks_string;
                                 };
                             }; // search
                         };
