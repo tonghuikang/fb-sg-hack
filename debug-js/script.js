@@ -13,7 +13,7 @@
  * limitations under the License. */
 // TODO during integration: This will be called when a new post is detected.
 // The search for new post is done every second.
-// TODO next: pipe these three API, since you need to ocr then keyword then search
+
 function onClick() {
     if (inputsAreEmpty()) {
         label.textContent = 'Error: one or both inputs are empty.';
@@ -40,8 +40,7 @@ function updateLabel() {
         image_url = 'https://' + image_url;
     }
 
-    var searchString = add_text;
-    var displayedResult = image_url + '\n' + searchString;
+    var displayedResult = image_url + '\n' + add_text;
 
     /////////////
     //// OCR ////
@@ -77,73 +76,123 @@ function updateLabel() {
             var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
             result_ocr = result_ocr.replace(/\n/g, " "); // replace newlines with space
             console.log(result_ocr);
-            searchString += result_ocr;
             // I don't know how to line break within paragraph cell :/
             label.textContent = label.textContent + longDivider + " result_ocr : " + result_ocr;
-            // console.log(jsonParsed.items[0].formattedUrl);
+            var text_to_parse = add_text + ' ' + result_ocr;
 
-            /////////////////
-            //// KEYWORD ////
-            /////////////////
+            ///////////////////////
+            //// KEYWORD-NOUNS ////
+            ///////////////////////
             // Using Google Natural Language API for entity sentiment anaysis
             // (why 'entity sentiment' - it captures words like 'evil' unlike 'entity' only)
-            // TODO next: extract the verb as well, entity-sentiment after syntax for now
-            // Then combine them into the result that is to be passed into 
             // -- TODO later: we want verb extraction (syntax) to be run concurrently
             // Future work: search the Claim Review directly - given-text-detect-claim
 
-            var xhr_keyword = new XMLHttpRequest();
-            var data_keyword = {
+            var xhr_keyword_n = new XMLHttpRequest();
+            var data_keyword_n = {
                 "encodingType": "UTF8",
                 "document": {
                     "type": "PLAIN_TEXT",
-                    "content": searchString
+                    "content": text_to_parse
                 }
             };
-            var body_keyword = JSON.stringify(data_keyword);
-            xhr_keyword.open("POST", 'https://language.googleapis.com/v1/documents:analyzeEntitySentiment?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
-            xhr_keyword.setRequestHeader('Content-Type', 'application/json');
-            xhr_keyword.send(body_keyword);
-            xhr_keyword.onreadystatechange = function() {
-                if (xhr_keyword.readyState === 4) {
-                    var serverResponse = xhr_keyword.responseText;
+            var body_keyword_n = JSON.stringify(data_keyword_n);
+            xhr_keyword_n.open("POST", 'https://language.googleapis.com/v1/documents:analyzeEntitySentiment?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
+            xhr_keyword_n.setRequestHeader('Content-Type', 'application/json');
+            xhr_keyword_n.send(body_keyword_n);
+            xhr_keyword_n.onreadystatechange = function() {
+                if (xhr_keyword_n.readyState === 4) {
+                    var serverResponse = xhr_keyword_n.responseText;
                     var jsonParsed = JSON.parse(serverResponse);
                     // okay I can now get any formatted result that I want from Google Custom Search
                     // Now we need to extract the relevant search keywords, the next step is Google cloud language
                     console.log("Google Natural Language API - entity sentiment results");
                     console.log(jsonParsed);
-                    var result_keyword = jsonParsed.entities[0].name; // WILL ITERATE AND GET ALL THE NAMES
-                    console.log(result_keyword);
+                    var noun_list = [];
+                    for (var index in jsonParsed.entities) {
+                        noun_list.push(jsonParsed.entities[index].name);
+                    }
+                    var nouns_string = noun_list.join(' ');
+                    console.log(nouns_string);
                     // I don't know how to line break within paragraph cell :/
-                    label.textContent = label.textContent + longDivider + " result_keyword (not used for the next step yet, haven't make use of the verbs also): " + result_keyword;
+                    label.textContent = label.textContent + longDivider + " result_keyword_noun (not used for the next step yet, haven't make use of the verbs also): " + nouns_string;
 
+                    ///////////////////////
+                    //// KEYWORD-VERBS ////
+                    ///////////////////////
+                    // Extraction of verbs with Google Natural Langauge API - Syntax
 
-
-                    ////////////////
-                    //// SEARCH ////
-                    ////////////////
-                    // Using Google Custom Search API to search certain fact-checking sites
-                    // The top three results will be shown beside the timestamp
-
-                    var xhr_search = new XMLHttpRequest();
-                    xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E&cx=006556501642864997360:yq85mpbgvaq&q=' + searchString, true);
-                    xhr_search.send(null);
-                    xhr_search.onreadystatechange = function() {
-                        if (xhr_search.readyState === 4) {
-                            var serverResponse = xhr_search.responseText;
+                    var xhr_keyword_v = new XMLHttpRequest();
+                    var data_keyword_v = {
+                        "encodingType": "UTF8",
+                        "document": {
+                            "type": "PLAIN_TEXT",
+                            "content": text_to_parse
+                        }
+                    };
+                    var body_keyword_v = JSON.stringify(data_keyword_v);
+                    xhr_keyword_v.open("POST", 'https://language.googleapis.com/v1/documents:analyzeSyntax?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
+                    xhr_keyword_v.setRequestHeader('Content-Type', 'application/json');
+                    xhr_keyword_v.send(body_keyword_v);
+                    xhr_keyword_v.onreadystatechange = function() {
+                        if (xhr_keyword_v.readyState === 4) {
+                            var serverResponse = xhr_keyword_v.responseText;
                             var jsonParsed = JSON.parse(serverResponse);
                             // okay I can now get any formatted result that I want from Google Custom Search
                             // Now we need to extract the relevant search keywords, the next step is Google cloud language
-                            console.log("Google Custom Search results");
+                            console.log("Google Natural Language API - syntax results");
                             console.log(jsonParsed);
-                            var result_search = jsonParsed.items[0].formattedUrl;
-                            console.log(result_search);
+
+
+                            var root_verbs = [];
+                            for (var index in jsonParsed.tokens) {
+                                // console.log(jsonParsed.tokens[index]);
+                                if (jsonParsed.tokens[index].dependencyEdge.label == 'ROOT') {
+                                    var word_in_context = jsonParsed.tokens[index].text.content;
+                                    console.log(jsonParsed.tokens[index].text.content);
+                                    root_verbs.push(word_in_context);
+                                }
+                            }
+                            //   if (obj.hasOwnProperty(key)) {
+                            //     var val = obj[key];
+                            //     console.log(val);
+                            //   }
+                            // }
+                            // var result_keyword = jsonParsed.entities[0].name; // WILL ITERATE AND GET ALL THE NAMES
+                            // console.log(result_keyword);
                             // I don't know how to line break within paragraph cell :/
-                            label.textContent = label.textContent + longDivider + " result_search : " + result_search;
+                            var verbs_string = root_verbs.join(' ');
+                            label.textContent = label.textContent + longDivider + " result_keyword_verb (not used for the next step yet, haven't make use of the verbs also): " + verbs_string;
+
+
+                            ////////////////
+                            //// SEARCH ////
+                            ////////////////
+                            // Using Google Custom Search API to search certain fact-checking sites
+                            // The top three results will be shown beside the timestamp
+
+                            var text_to_search = nouns_string + ' ' + verbs_string;
+                            var xhr_search = new XMLHttpRequest();
+                            xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E&cx=006556501642864997360:yq85mpbgvaq&q=' + text_to_search, true);
+                            xhr_search.send(null);
+                            xhr_search.onreadystatechange = function() {
+                                if (xhr_search.readyState === 4) {
+                                    var serverResponse = xhr_search.responseText;
+                                    var jsonParsed = JSON.parse(serverResponse);
+                                    // okay I can now get any formatted result that I want from Google Custom Search
+                                    // Now we need to extract the relevant search keywords, the next step is Google cloud language
+                                    console.log("Google Custom Search results");
+                                    console.log(jsonParsed);
+                                    var result_search = jsonParsed.items[0].formattedUrl;
+                                    console.log(result_search);
+                                    // I don't know how to line break within paragraph cell :/
+                                    label.textContent = label.textContent + longDivider + " result_search : " + result_search;
+                                };
+                            }; // search
                         };
-                    }; // search
+                    }; // keywords-verbs
                 };
-            }; // keywords
+            }; // keywords-nouns
         };
     }; // OCR
 
