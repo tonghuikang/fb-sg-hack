@@ -9,7 +9,7 @@ var add_link = function(source, _link, description){
 		newlink.innerHTML = description;
 		node.appendChild(newlink);
 		time_position[0].appendChild(node);
-		add_checkbox(node);
+		add_checkbox(node, source, _link, description);
 	}
 }
 
@@ -24,7 +24,7 @@ var find_text = function(source, class_name){
 	return output
 }
 
-var add_checkbox = function(source){
+var add_checkbox = function(node, source, _link, description){
 	var checkbox_positive = document.createElement("input");
 	checkbox_positive.type = "checkbox";
 	checkbox_positive.name = "positive_box";
@@ -34,17 +34,17 @@ var add_checkbox = function(source){
 	checkbox_negative.name = "negative_box";
 	
 	var label = document.createElement("label");
-	label.appendChild(document.createTextNode("Relevant article?"));
+	label.appendChild(document.createTextNode(" relevant? "));
 	var label_yes = document.createElement("label");
 	label_yes.appendChild(document.createTextNode("YES"));
 	var label_no = document.createElement("label");
-	label_no.appendChild(document.createTextNode("No?"));
+	label_no.appendChild(document.createTextNode("NO"));
 	
-	source.appendChild(label);
-	source.appendChild(checkbox_positive);
-	source.appendChild(label_yes);
-	source.appendChild(checkbox_negative);
-	source.appendChild(label_no);
+	node.appendChild(label);
+	node.appendChild(checkbox_positive);
+	node.appendChild(label_yes);
+	node.appendChild(checkbox_negative);
+	node.appendChild(label_no);
 	
 	checkbox_positive.addEventListener("change", function(){
 		if (this.checked){
