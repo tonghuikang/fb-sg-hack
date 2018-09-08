@@ -1,11 +1,16 @@
 var picture_lib = ["_2a2q _65sr", "_5cq3 _1ktf", "_1ktf", "_6ks"];
 
 var add_link = function(source, _link, description){
-	var time_position = source.getElementsByClassName("_5pcp _5lel _2jyu _232_");
-	var newlink = document.createElement("a");
-	newlink.setAttribute("herf", _link);
-	newlink.innerHTML = description;
-	time_position[0].appendChild(newlink);
+	if (_link){
+		var time_position = source.getElementsByClassName("_5pcp _5lel _2jyu _232_");
+		var node = document.createElement("p");
+		var newlink = document.createElement("a");
+		newlink.setAttribute("href", _link);
+		newlink.innerHTML = description;
+		node.appendChild(newlink);
+		time_position[0].appendChild(node);
+		add_checkbox(node);
+	}
 }
 
 
@@ -20,7 +25,6 @@ var find_text = function(source, class_name){
 }
 
 var add_checkbox = function(source){
-	var time_position = source.getElementsByClassName("_5pcp _5lel _2jyu _232_");
 	var checkbox_positive = document.createElement("input");
 	checkbox_positive.type = "checkbox";
 	checkbox_positive.name = "positive_box";
@@ -30,17 +34,17 @@ var add_checkbox = function(source){
 	checkbox_negative.name = "negative_box";
 	
 	var label = document.createElement("label");
-	label.appendChild(document.createTextNode("Is the article relevant?"));
+	label.appendChild(document.createTextNode("Relevant article?"));
 	var label_yes = document.createElement("label");
 	label_yes.appendChild(document.createTextNode("YES"));
 	var label_no = document.createElement("label");
 	label_no.appendChild(document.createTextNode("No?"));
 	
-	time_position[0].appendChild(label);
-	time_position[0].appendChild(checkbox_positive);
-	time_position[0].appendChild(label_yes);
-	time_position[0].appendChild(checkbox_negative);
-	time_position[0].appendChild(label_no);
+	source.appendChild(label);
+	source.appendChild(checkbox_positive);
+	source.appendChild(label_yes);
+	source.appendChild(checkbox_negative);
+	source.appendChild(label_no);
 	
 	checkbox_positive.addEventListener("change", function(){
 		if (this.checked){
