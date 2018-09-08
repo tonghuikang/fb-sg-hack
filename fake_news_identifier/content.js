@@ -64,7 +64,7 @@ var find_post = function(){
 			
 			var shared = post.getElementsByClassName("mtm _5pcm");
 			if (!shared.length==0){
-				find_text(post, "mtm _5pco _2zpv")
+				find_text(post, "mtm _5pco")
 				if (is_video.length==0){
 					var photo = find_img(post);
 				}else{
