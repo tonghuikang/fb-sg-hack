@@ -1,0 +1,12 @@
+{	
+	"name": "FB claim identifier",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "FB hackathon",
+	"content_security_policy": "script-src 'self' https://connect.facebook.net https://graph.facebook.com; object-src 'self'",
+	"content_scripts": [{
+	 "js": ["content.js"],
+	 "matches": ["https://www.facebook.com/*",
+	 "https://connect.facebook.net/en_US/all.js"]
+	}]
+}
