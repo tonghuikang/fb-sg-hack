@@ -11,12 +11,12 @@ var add_link = function(source, _link){
 
 
 var find_text = function(source, class_name){
-	var output = ""
+	var output = "";
 	var text_positions = source.getElementsByClassName(class_name);
 	for (var j=0, len=text_positions.length; j<len; j++){
 		output += text_positions[j].textContent; 
 	}
-	console.log(output)
+	console.log(output);
 }
 
 var find_img = function(source){
@@ -25,7 +25,7 @@ var find_img = function(source){
 	for (var k=0; k<picture_lib.length; k++){
 		var prob_imgs = source.getElementsByClassName(picture_lib[k]);
 		if (!prob_imgs.length==0){
-			imgs = prob_imgs
+			imgs = prob_imgs;
 		}
 	}
 	if (!imgs.length==0){
