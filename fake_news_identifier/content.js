@@ -21,6 +21,22 @@ var find_text = function(source, class_name){
 }
 
 
+var b64 = function (url, cb) {
+    var image = new Image();
+    image.setAttribute('crossOrigin', 'anonymous');
+    image.onload = function () {
+      var canvas = document.createElement('canvas');
+      canvas.height = this.naturalHeight;
+      canvas.width = this.naturalWidth;
+      canvas.getContext('2d').drawImage(this, 0, 0);
+      var b64data = canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg);base64,/, '');
+      cb(b64data);
+    };
+    image.src = url;
+  };
+
+
+
 var fact_checker = function(location, image_url, add_text) {
 
     if (!image_url.match(/^[a-zA-Z]+:\/\//)) {
@@ -28,6 +44,7 @@ var fact_checker = function(location, image_url, add_text) {
     }
 
     var displayedResult = image_url + '\n' + add_text;
+    var data_ocr = {};
 
     /////////////
     //// OCR ////
@@ -36,32 +53,35 @@ var fact_checker = function(location, image_url, add_text) {
     // Using TEXT_DETECTION instead of DOCUMENT_TEXT_DETECTION, no particular reason
 
     var xhr_ocr = new XMLHttpRequest();
-    var data_ocr = {
-        "requests": [{
-            "features": [{
-                "type": "TEXT_DETECTION"
-            }],
-            "image": {
-                "source": {
-                    "imageUri": image_url
-                }
-            }
-        }]
-    };
+
+    b64(image_url, function (b64data) {
+        var data = {
+            "requests": [{
+              "image": {"content": b64data},
+              "features": [{'type': 'TEXT_DETECTION'}]
+            }]
+          };
+        data_ocr = data;
+
+    console.log(data_ocr);
+
     var body_ocr = JSON.stringify(data_ocr);
     xhr_ocr.open("POST", 'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyD6Csdss9VNdvqtu2rOJ0n19nZC6pHk-_E', true);
     xhr_ocr.setRequestHeader('Content-Type', 'application/json');
     xhr_ocr.send(body_ocr);
     xhr_ocr.onreadystatechange = function() {
         if (xhr_ocr.readyState === 4) {
-            // var serverResponse = xhr_ocr.responseText;
-            // var jsonParsed = JSON.parse(serverResponse);
-            // // okay I can now get any formatted result that I want from Google Custom Search
-            // // Now we need to extract the relevant search keywords, the next step is Google cloud language
-            // console.log("Google Vision API - OCR results");
-            // console.log(jsonParsed);
-			// var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
-			var result_ocr = ''; // NOTHING FOR NOW
+            var serverResponse = xhr_ocr.responseText;
+            var jsonParsed = JSON.parse(serverResponse);
+            // okay I can now get any formatted result that I want from Google Custom Search
+            // Now we need to extract the relevant search keywords, the next step is Google cloud language
+            console.log("Google Vision API - OCR results");
+            console.log(jsonParsed);
+            if (jsonParsed.responses[0].length > 0){
+                var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
+            } else {
+                var result_ocr = '';
+            }
             // BUG - SPOILS WHEN THE IMAGES DOES NOT CONTAIN ANY TEXT.
             result_ocr = result_ocr.replace(/\n/g, " "); // replace newlines with space
             console.log(result_ocr);
@@ -169,16 +189,16 @@ var fact_checker = function(location, image_url, add_text) {
                                     console.log(jsonParsed);
                                     var fact_checks_list = [];
                                     for (var index in jsonParsed.items){
-                                      var fact_check_title = jsonParsed.items[index].title;
-                                      var fact_check_link = jsonParsed.items[index].link;
-                                      console.log(fact_check_title);
-                                      console.log(fact_check_link);
-									  fact_checks_list.push(fact_check_link + ':' + fact_check_title + ' --- ');
-									  add_link(location, fact_check_link, fact_check_title);
+                                    var fact_check_title = jsonParsed.items[index].title;
+                                    var fact_check_link = jsonParsed.items[index].link;
+                                    console.log(fact_check_title);
+                                    console.log(fact_check_link);
+                                    fact_checks_list.push(fact_check_link + ':' + fact_check_title + ' --- ');
+                                    add_link(location, fact_check_link, fact_check_title);
                                     }
                                     var fact_checks_string = fact_checks_list.join(' ');
                                     // label.textContent = label.textContent + longDivider + " result_search : " + fact_checks_string;
-								};
+                                };
                             }; // search
                         };
                     }; // keywords-verbs
@@ -187,6 +207,7 @@ var fact_checker = function(location, image_url, add_text) {
         };
     }; // OCR
 
+    }); // b64 image loading
 
     // label.textContent = displayedResult;
 
