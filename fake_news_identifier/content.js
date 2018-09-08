@@ -2,10 +2,9 @@ var picture_lib = ["_2a2q _65sr", "_5cq3 _1ktf", "_1ktf", "_6ks"];
 
 var add_link = function(source, _link, description){
 	var time_position = source.getElementsByClassName("_5pcp _5lel _2jyu _232_");
-	var node = document.createTextNode(description);
 	var newlink = document.createElement("a");
 	newlink.setAttribute("herf", _link);
-	newlink.appendChild(node);
+	newlink.innerHTML = description;
 	time_position[0].appendChild(newlink);
 }
 
@@ -77,7 +76,7 @@ var fact_checker = function(location, image_url, add_text) {
             // Now we need to extract the relevant search keywords, the next step is Google cloud language
             console.log("Google Vision API - OCR results");
             console.log(jsonParsed);
-            if (jsonParsed.responses[0].length > 0){
+            if (jsonParsed.responses[0].hasOwnProperty('fullTextAnnotation')){
                 var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
             } else {
                 var result_ocr = '';

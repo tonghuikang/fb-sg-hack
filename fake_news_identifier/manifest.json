@@ -6,7 +6,6 @@
 	"content_security_policy": "script-src 'self' https://www.youtube.com; object-src 'self'",
 	"content_scripts": [{
 	 "js": ["content.js"],
-	 "matches": ["https://www.facebook.com/*",
-	 "https://connect.facebook.net/en_US/all.js"]
+	 "matches": ["https://www.facebook.com/*"]
 	}]
 }
