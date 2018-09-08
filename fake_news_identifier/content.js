@@ -11,10 +11,12 @@ var add_link = function(source, _link){
 
 
 var find_text = function(source, class_name){
+	var output = ""
 	var text_positions = source.getElementsByClassName(class_name);
 	for (var j=0, len=text_positions.length; j<len; j++){
-		console.log(text_positions[j].textContent); 
+		output += text_positions[j].textContent; 
 	}
+	console.log(output)
 }
 
 var find_img = function(source){
@@ -26,12 +28,18 @@ var find_img = function(source){
 			imgs = prob_imgs
 		}
 	}
-	var pictures = imgs[0].getElementsByTagName("img");
-	for (var j=0; j<imgs.length; j++){
-		srclist.push(pictures[j].src);
+	if (!imgs.length==0){
+		var pictures = imgs[0].getElementsByTagName("img");
+		for (var j=0; j<imgs.length; j++){
+			srclist.push(pictures[j].src);
+		}
+		console.log(srclist[0]);
+		return srclist[0]
+	}else{
+		console.log("https://i.imgur.com/hwOrFan.png")
+		return "https://i.imgur.com/hwOrFan.png"
 	}
-	console.log(srclist[0]);
-	return srclist[0]
+	
 }
 var find_video = function(source){
 	var srclist = [];
@@ -45,10 +53,12 @@ var posts = new Set();
 var find_post = function(){
 	var new_posts = document.getElementsByClassName("_4-u2 mbm _4mrt _5jmm _5pat _5v3q _4-u8");
 	for (var i=0; i<new_posts.length; i++){
-		var post = new_posts[i];
-		if (!posts.has(post)){
-			posts.add(post);
+		var a_post = new_posts[i];
+		if (!posts.has(a_post)){
+			posts.add(a_post);
 			
+			var mains = a_post.getElementsByClassName("_1dwg _1w_m _q7o");
+			var post = mains[0];
 			var is_video = post.getElementsByClassName("_150c");
 
 			
@@ -60,7 +70,6 @@ var find_post = function(){
 				}else{
 					var photo = find_video(is_video);
 				}
-				console.log(photo);
 				add_link(shared[0], photo);
 			}
 			
@@ -77,7 +86,6 @@ var find_post = function(){
 				}else{
 					var photo = find_video(is_video);
 				}
-				console.log(photo);
 				add_link(post, photo);
 			}
 		}
