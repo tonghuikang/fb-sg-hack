@@ -72,22 +72,6 @@ var b64 = function (url, cb) {
 
 
 
-var b64 = function (url, cb) {
-    var image = new Image();
-    image.setAttribute('crossOrigin', 'anonymous');
-    image.onload = function () {
-      var canvas = document.createElement('canvas');
-      canvas.height = this.naturalHeight;
-      canvas.width = this.naturalWidth;
-      canvas.getContext('2d').drawImage(this, 0, 0);
-      var b64data = canvas.toDataURL('image/png').replace(/^data:image\/(png|jpg);base64,/, '');
-      cb(b64data);
-    };
-    image.src = url;
-  };
-
-
-
 var fact_checker = function(location, image_url, add_text) {
 
     if (!image_url.match(/^[a-zA-Z]+:\/\//)) {
