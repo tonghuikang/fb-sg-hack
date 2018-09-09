@@ -1,5 +1,7 @@
 # https://tinyurl.com/badmemez
 
+![screenshot](./screenshot.png)
+
 # Disclaimer
 We are not liable for any damages to the maximum extent provided by law.
 
