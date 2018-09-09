@@ -140,7 +140,7 @@ var b64 = function (url, cb) {
           // okay I can now get any formatted result that I want from Google Custom Search
           // Now we need to extract the relevant search keywords, the next step is Google cloud language
           //console.log("Google Vision API - OCR results");
-          //console.log(jsonParsed);
+          console.log(jsonParsed);
           //console.log(jsonParsed.responses[0].length);
           if (jsonParsed.responses[0].hasOwnProperty('fullTextAnnotation')){
             var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
@@ -183,7 +183,7 @@ var b64 = function (url, cb) {
               // okay I can now get any formatted result that I want from Google Custom Search
               // Now we need to extract the relevant search keywords, the next step is Google cloud language
               //console.log("Google Natural Language API - entity sentiment results");
-              //console.log(jsonParsed);
+              console.log(jsonParsed);
               var noun_list = [];
               for (var index in jsonParsed.entities) {
                 noun_list.push(jsonParsed.entities[index].name);
@@ -219,7 +219,7 @@ var b64 = function (url, cb) {
                   // okay I can now get any formatted result that I want from Google Custom Search
                   // Now we need to extract the relevant search keywords, the next step is Google cloud language
                   //console.log("Google Natural Language API - syntax results");
-                  //console.log(jsonParsed);
+                  console.log(jsonParsed);
   
   
   
@@ -255,10 +255,10 @@ var b64 = function (url, cb) {
                   }
                   var text_to_search = nouns_string + ' ' + verbs_string;
                   var xhr_search = new XMLHttpRequest();
-                  xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAu3-oR7sduccQjKHKlnoqFGT3L-ttneyA&cx=006556501642864997360:yq85mpbgvaq&q=' + text_to_search, true);
+                  xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyCBt04yt1ErxFCQKWMGp1qget3tzRZyozs&cx=006556501642864997360:yq85mpbgvaq&q=' + text_to_search, true);
                   setTimeout(function(){}, Math.random()*100);
                   xhr_search.send(null);
-                  //console.log("Running Google Custom Search API to search fact-check articles : " + text_to_search)
+                  console.log("Running Google Custom Search API to search fact-check articles : " + text_to_search)
                   xhr_search.onreadystatechange = function() {
                     if (xhr_search.readyState === 4) {
                       var serverResponse = xhr_search.responseText;
@@ -267,7 +267,7 @@ var b64 = function (url, cb) {
                       // Now we need to extract the relevant search keywords, the next step is Google cloud language
                       // BUG: If no entity or verbs are being detected nothing will be searched.
                       //console.log("Google Custom Search results");
-                      //console.log(jsonParsed);
+                      console.log(jsonParsed);
                       var fact_checks_list = [];
 					  console.log(jsonParsed.items);
 					  var count = 0;
@@ -277,10 +277,10 @@ var b64 = function (url, cb) {
                         var fact_check_link = jsonParsed.items[index].link;
                         fact_checks_list.push(fact_check_link + ':' + fact_check_title + ' --- ');
                         add_link(source, fact_check_link, fact_check_title);
-						count ++;
-						if (count == 3){
-							break;
-						}
+						// count ++;
+						// if (count == 3){
+						// 	break;
+						// }
                       }
                       var fact_checks_string = fact_checks_list.join(' ');
                       // label.textContent = label.textContent + longDivider + " result_search : " + fact_checks_string;
