@@ -1,15 +1,19 @@
 var picture_lib = ["_2a2q _65sr", "_5cq3 _1ktf", "_1ktf", "_6ks"];
 
-var add_link = function(source, _link, description){
+var add_link = function(time_position, _link, description){
 	if (_link){
-		var time_position = source.getElementsByClassName("_5pcp _5lel _2jyu _232_");
-		var node = document.createElement("p");
+		var list = document.createElement("li");
+		time_position[0].appendChild(list);
 		var newlink = document.createElement("a");
 		newlink.setAttribute("href", _link);
 		newlink.innerHTML = description;
-		node.appendChild(newlink);
-		time_position[0].appendChild(node);
-		add_checkbox(node, source, _link, description);
+		list.appendChild(newlink);
+		var node_1 = document.createElement("p");
+		list.appendChild(node_1)
+		add_checkbox(node_1, _link, description);
+		var node_2 = document.createElement("br");
+		//node_2.appendChild(document.createTextNode(" "));
+		list.appendChild(node_2);
 	}
 }
 
@@ -20,11 +24,11 @@ var find_text = function(source, class_name){
 	for (var j=0, len=text_positions.length; j<len; j++){
 		output += text_positions[j].textContent; 
 	}
-	console.log(output);
+	//console.log(output);
 	return output
 }
 
-var add_checkbox = function(node, source, _link, description){
+var add_checkbox = function(node, _link, description){
 	var checkbox_positive = document.createElement("input");
 	checkbox_positive.type = "checkbox";
 	checkbox_positive.name = "positive_box";
@@ -92,7 +96,7 @@ var b64 = function (url, cb) {
   
   
   
-  var fact_checker = function(location, image_url, add_text) {
+  var fact_checker = function(_location, image_url, add_text) {
   
     if (!image_url.match(/^[a-zA-Z]+:\/\//)) {
       image_url = 'https://' + image_url;
@@ -122,7 +126,7 @@ var b64 = function (url, cb) {
       };
       data_ocr = data;
   
-      console.log(data_ocr);
+      //console.log(data_ocr);
   
       var body_ocr = JSON.stringify(data_ocr);
       xhr_ocr.open("POST", 'https://vision.googleapis.com/v1/images:annotate?key=AIzaSyAu3-oR7sduccQjKHKlnoqFGT3L-ttneyA', true);
@@ -135,9 +139,9 @@ var b64 = function (url, cb) {
           var jsonParsed = JSON.parse(serverResponse);
           // okay I can now get any formatted result that I want from Google Custom Search
           // Now we need to extract the relevant search keywords, the next step is Google cloud language
-          console.log("Google Vision API - OCR results");
-          console.log(jsonParsed);
-          console.log(jsonParsed.responses[0].length);
+          //console.log("Google Vision API - OCR results");
+          //console.log(jsonParsed);
+          //console.log(jsonParsed.responses[0].length);
           if (jsonParsed.responses[0].hasOwnProperty('fullTextAnnotation')){
             var result_ocr = jsonParsed.responses[0].fullTextAnnotation.text;
             } else {
@@ -145,7 +149,7 @@ var b64 = function (url, cb) {
             }
           // BUG - SPOILS WHEN THE IMAGES DOES NOT CONTAIN ANY TEXT.
           result_ocr = result_ocr.replace(/\n/g, " "); // replace newlines with space
-          console.log(result_ocr);
+          //console.log(result_ocr);
           // I don't know how to line break within paragraph cell :/
           // label.textContent = label.textContent + longDivider + " result_ocr : " + result_ocr;
           var text_to_parse = add_text + ' ' + result_ocr;
@@ -171,22 +175,22 @@ var b64 = function (url, cb) {
           xhr_keyword_n.setRequestHeader('Content-Type', 'application/json');
           setTimeout(function(){}, Math.random()*100);
           xhr_keyword_n.send(body_keyword_n);
-          console.log("Running Google Natural Language API on for entity sentiment: " + text_to_parse)
+          //console.log("Running Google Natural Language API on for entity sentiment: " + text_to_parse)
           xhr_keyword_n.onreadystatechange = function() {
             if (xhr_keyword_n.readyState === 4) {
               var serverResponse = xhr_keyword_n.responseText;
               var jsonParsed = JSON.parse(serverResponse);
               // okay I can now get any formatted result that I want from Google Custom Search
               // Now we need to extract the relevant search keywords, the next step is Google cloud language
-              console.log("Google Natural Language API - entity sentiment results");
-              console.log(jsonParsed);
+              //console.log("Google Natural Language API - entity sentiment results");
+              //console.log(jsonParsed);
               var noun_list = [];
               for (var index in jsonParsed.entities) {
                 noun_list.push(jsonParsed.entities[index].name);
               }
               var nouns_amount = noun_list.length;
               var nouns_string = noun_list.join(' ');
-              console.log(nouns_string);
+              //console.log(nouns_string);
               // label.textContent = label.textContent + longDivider + " result_keyword_noun (not used for the next step yet, haven't make use of the verbs also): " + nouns_string;
   
               ///////////////////////
@@ -207,15 +211,15 @@ var b64 = function (url, cb) {
               xhr_keyword_v.setRequestHeader('Content-Type', 'application/json');
               setTimeout(function(){}, Math.random()*100);
               xhr_keyword_v.send(body_keyword_v);
-              console.log("Running Google Natural Language API for syntax analysis: " + text_to_parse)
+              //console.log("Running Google Natural Language API for syntax analysis: " + text_to_parse)
               xhr_keyword_v.onreadystatechange = function() {
                 if (xhr_keyword_v.readyState === 4) {
                   var serverResponse = xhr_keyword_v.responseText;
                   var jsonParsed = JSON.parse(serverResponse);
                   // okay I can now get any formatted result that I want from Google Custom Search
                   // Now we need to extract the relevant search keywords, the next step is Google cloud language
-                  console.log("Google Natural Language API - syntax results");
-                  console.log(jsonParsed);
+                  //console.log("Google Natural Language API - syntax results");
+                  //console.log(jsonParsed);
   
   
   
@@ -224,7 +228,7 @@ var b64 = function (url, cb) {
                     // console.log(jsonParsed.tokens[index]);
                     if (jsonParsed.tokens[index].dependencyEdge.label == 'ROOT') {
                       var word_in_context = jsonParsed.tokens[index].text.content;
-                      console.log(jsonParsed.tokens[index].text.content);
+                      //console.log(jsonParsed.tokens[index].text.content);
                       root_verbs.push(word_in_context);
                     }
                   }
@@ -254,7 +258,7 @@ var b64 = function (url, cb) {
                   xhr_search.open("GET", 'https://www.googleapis.com/customsearch/v1?key=AIzaSyAu3-oR7sduccQjKHKlnoqFGT3L-ttneyA&cx=006556501642864997360:yq85mpbgvaq&q=' + text_to_search, true);
                   setTimeout(function(){}, Math.random()*100);
                   xhr_search.send(null);
-                  console.log("Running Google Custom Search API to search fact-check articles : " + text_to_search)
+                  //console.log("Running Google Custom Search API to search fact-check articles : " + text_to_search)
                   xhr_search.onreadystatechange = function() {
                     if (xhr_search.readyState === 4) {
                       var serverResponse = xhr_search.responseText;
@@ -262,16 +266,21 @@ var b64 = function (url, cb) {
                       // okay I can now get any formatted result that I want from Google Custom Search
                       // Now we need to extract the relevant search keywords, the next step is Google cloud language
                       // BUG: If no entity or verbs are being detected nothing will be searched.
-                      console.log("Google Custom Search results");
-                      console.log(jsonParsed);
+                      //console.log("Google Custom Search results");
+                      //console.log(jsonParsed);
                       var fact_checks_list = [];
+					  console.log(jsonParsed.items);
+					  var count = 0;
+					  var source = _location.getElementsByClassName("_5pcp _5lel _2jyu _232_");
                       for (var index in jsonParsed.items) {
                         var fact_check_title = jsonParsed.items[index].title;
                         var fact_check_link = jsonParsed.items[index].link;
-                        console.log(fact_check_title);
-                        console.log(fact_check_link);
                         fact_checks_list.push(fact_check_link + ':' + fact_check_title + ' --- ');
-                        add_link(location, fact_check_link, fact_check_title);
+                        add_link(source, fact_check_link, fact_check_title);
+						count ++;
+						if (count == 3){
+							break;
+						}
                       }
                       var fact_checks_string = fact_checks_list.join(' ');
                       // label.textContent = label.textContent + longDivider + " result_search : " + fact_checks_string;
@@ -306,10 +315,10 @@ var find_img = function(source){
 		for (var j=0; j<imgs.length; j++){
 			srclist.push(pictures[j].src);
 		}
-		console.log(srclist[0]);
+		//console.log(srclist[0]);
 		return srclist[0]
 	}else{
-		console.log("https://i.imgur.com/hwOrFan.png")
+		//console.log("https://i.imgur.com/hwOrFan.png")
 		return "https://i.imgur.com/hwOrFan.png"
 	}
 	
@@ -344,8 +353,7 @@ var find_post = function(){
 					var photo = find_video(is_video);
 				}
 
-				fact_checker(shared[0], photo, description_text);
-				add_checkbox(shared[0]);
+				fact_checker(shared[0], photo, description_text);;
 			}
 			
 			
@@ -361,8 +369,7 @@ var find_post = function(){
 				}else{
 					var photo = find_video(is_video);
 				}
-				fact_checker(post, photo, description_text);
-				add_checkbox(post);
+				fact_checker(post, photo, description_text);;
 			}
 		}
 	}
