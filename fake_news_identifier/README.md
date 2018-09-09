@@ -1,3 +1,5 @@
+# https://tinyurl.com/badmemez
+
 # Disclaimer
 We are not liable for any damages to the maximum extent provided by law.
 
